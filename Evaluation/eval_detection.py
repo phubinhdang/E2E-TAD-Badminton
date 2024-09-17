@@ -1,21 +1,13 @@
 import json
+import logging
 import sys
-
-import urllib.error, urllib.parse
 
 import numpy as np
 import pandas as pd
-
-from .utils import get_blocked_videos
-from .utils import interpolated_prec_rec
-from .utils import segment_iou
-import pdb
-import traceback
-import logging
-
-
 from joblib import Parallel, delayed
 
+from .utils import interpolated_prec_rec
+from .utils import segment_iou
 
 logger_initilized = False
 
@@ -344,8 +336,8 @@ def compute_average_precision_detection(ground_truth, prediction, tiou_threshold
 
     for tidx in range(len(tiou_thresholds)):
         # Computing prec-rec
-        this_tp = np.cumsum(tp[tidx,:]).astype(np.float)
-        this_fp = np.cumsum(fp[tidx,:]).astype(np.float)
+        this_tp = np.cumsum(tp[tidx,:]).astype(np.float64)
+        this_fp = np.cumsum(fp[tidx,:]).astype(np.float64)
         rec = this_tp / npos
         prec = this_tp / (this_tp + this_fp)
         ap[tidx] = interpolated_prec_rec(prec, rec)
