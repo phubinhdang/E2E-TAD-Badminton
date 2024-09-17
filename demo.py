@@ -4,12 +4,11 @@
 # ------------------------------------------------------------------------
 
 
+import torch
+
 from models import build_model
 from opts import update_cfg_from_file
 from util.misc import NestedTensor
-import torch
-import time
-import pdb
 
 
 # @torch.no_grad()

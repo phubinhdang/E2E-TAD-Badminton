@@ -1,23 +1,17 @@
 """
 Video encoder modules.
 """
-import ipdb as pdb
-from collections import OrderedDict
-from typing import Dict, List
 import logging
 
 import torch
 import torch.nn.functional as F
-from torch.nn.modules.normalization import GroupNorm
-import torchvision
-from torch import nn
-from torchvision.models._utils import IntermediateLayerGetter
 from einops import rearrange
+from torch import nn
 
-from models.video_encoder_archs.tsm import TSM
 from models.video_encoder_archs.slowfast import ResNet3dSlowFast
-from util.misc import NestedTensor, is_main_process
+from models.video_encoder_archs.tsm import TSM
 from opts import cfg
+from util.misc import NestedTensor
 
 
 def unfold(ip, kernel_size, stride):

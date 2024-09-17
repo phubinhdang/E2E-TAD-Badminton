@@ -7,24 +7,19 @@
 
 import json
 import logging
-import math
 import os.path as osp
-import ipdb as pdb
 
-import numpy as np
-import pandas as pd
-import torch
-import torch.nn.functional as F
-import torch.utils.data
-import tqdm
 import h5py
-
-from .data_utils import get_dataset_dict, load_feature, get_dataset_info
-from .e2e_lib import make_img_transform, load_video_frames
-# from util.config import cfg
+import numpy as np
+import torch
+import torch.utils.data
 
 from util.segment_ops import segment_t1t2_to_cw
+from .data_utils import get_dataset_dict, load_feature, get_dataset_info
+from .e2e_lib import make_img_transform, load_video_frames
 
+
+# from util.config import cfg
 
 
 class TADDataset(torch.utils.data.Dataset):
