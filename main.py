@@ -31,6 +31,7 @@ import util.misc as utils
 from datasets import build_dataset
 from engine import train_one_epoch, test
 from models import build_model
+
 if cfg.tensorboard:
     from torch.utils.tensorboard import SummaryWriter
 
@@ -118,26 +119,29 @@ def main(args):
         {
             "params":
                 [p for n, p in model_without_ddp.named_parameters()
-                 if not match_name_keywords(n, cfg.lr_backbone_names) and not match_name_keywords(n, cfg.lr_linear_proj_names) and p.requires_grad],
+                 if not match_name_keywords(n, cfg.lr_backbone_names) and not match_name_keywords(n,
+                                                                                                  cfg.lr_linear_proj_names) and p.requires_grad],
             "lr": cfg.lr,
             "initial_lr": cfg.lr
         },
         # backbone
         {
-            "params": [p for n, p in model_without_ddp.named_parameters() if match_name_keywords(n, cfg.lr_backbone_names) and p.requires_grad],
+            "params": [p for n, p in model_without_ddp.named_parameters() if
+                       match_name_keywords(n, cfg.lr_backbone_names) and p.requires_grad],
             "lr": cfg.lr_backbone,
             "initial_lr": cfg.lr_backbone
         },
         # offset
         {
-            "params": [p for n, p in model_without_ddp.named_parameters() if match_name_keywords(n, cfg.lr_linear_proj_names) and p.requires_grad],
+            "params": [p for n, p in model_without_ddp.named_parameters() if
+                       match_name_keywords(n, cfg.lr_linear_proj_names) and p.requires_grad],
             "lr": cfg.lr * cfg.lr_linear_proj_mult,
             "initial_lr": cfg.lr * cfg.lr_linear_proj_mult
         }
     ]
 
     optimizer = torch.optim.__dict__[cfg.optimizer](param_dicts, lr=cfg.lr,
-                                                     weight_decay=cfg.weight_decay)
+                                                    weight_decay=cfg.weight_decay)
 
     output_dir = Path(cfg.output_dir)
 
@@ -149,7 +153,8 @@ def main(args):
     if 'model_best.pth' in os.listdir(cfg.output_dir) and not args.resume and not args.eval:
         # for many times, my trained models were accidentally overwrittern by new models😂. So I add this to avoid that
         logging.error(
-            'Danger! You are overwriting an existing output dir {}, probably because you forget to change the output_dir option'.format(cfg.output_dir))
+            'Danger! You are overwriting an existing output dir {}, probably because you forget to change the output_dir option'.format(
+                cfg.output_dir))
         confirm = input('confirm: y/n')
         if confirm != 'y':
             return
@@ -186,7 +191,8 @@ def main(args):
                                        collate_fn=utils.collate_fn, num_workers=args.num_workers, pin_memory=True)
 
     data_loader_val = DataLoader(dataset_val, cfg.batch_size, sampler=sampler_val,
-                                 drop_last=False, collate_fn=utils.collate_fn, num_workers=args.num_workers, pin_memory=True)
+                                 drop_last=False, collate_fn=utils.collate_fn, num_workers=args.num_workers,
+                                 pin_memory=True)
 
     base_ds = dataset_val.video_dict
 
@@ -221,7 +227,8 @@ def main(args):
 
     if args.eval:
         test_stats = test(model, criterion, postprocessors,
-                          data_loader_val, base_ds, device, cfg.output_dir, cfg, subset=cfg.test_set, epoch=checkpoint['epoch'], test_mode=True)
+                          data_loader_val, base_ds, device, cfg.output_dir, cfg, subset=cfg.test_set,
+                          epoch=checkpoint['epoch'], test_mode=True)
 
         return
 
@@ -287,7 +294,8 @@ def main(args):
                 f.write(json.dumps(log_stats) + "\n")
             if smry_writer:
                 for k, v in log_stats.items():
-                    if re.findall('loss_\S+unscaled', k) or k.endswith('loss') or 'lr' in k or 'AP50' in k or 'AP75' in k or 'AP95' in k or 'mAP' in k or 'AR' in k:
+                    if re.findall('loss_\S+unscaled', k) or k.endswith(
+                            'loss') or 'lr' in k or 'AP50' in k or 'AP75' in k or 'AP95' in k or 'mAP' in k or 'AR' in k:
                         smry_writer.add_scalar(k, v, epoch)
 
     total_time = time.time() - start_time
@@ -304,6 +312,7 @@ def main(args):
 
 if __name__ == '__main__':
     import argparse
+
     parser = argparse.ArgumentParser(
         'DETR training and evaluation script', parents=[get_args_parser()])
     args = parser.parse_args()
