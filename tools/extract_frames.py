@@ -49,7 +49,7 @@ def main(subset):
     mkdir_if_missing(log_dir)
     mkdir_if_missing(args.video_dir)
 
-    database = json.load(open('data/thumos14/th14_annotations_with_fps_duration.json'))['database']
+    database = json.load(open('data/badminton/badminton_annotations_with_fps_duration.json'))['database']
     vid_names = list(sorted([x for x in database if database[x]['subset'] == subset]))
 
     start_ind = 0 if args.start is None else args.start
@@ -70,6 +70,6 @@ def main(subset):
 if __name__ == '__main__':
     main('val')
     main('test')
-
+# want to download video and try out. but 78GB hhaa see https://github.com/open-mmlab/mmaction2/blob/main/tools/data/thumos14/download_videos.sh
 # thumos14
 # python tools/extract_frames.py --video_dir data/thumos14/videos --frame_dir data/thumos14/img10fps --fps  10 -e 4

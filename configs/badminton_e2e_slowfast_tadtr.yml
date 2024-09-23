@@ -1,0 +1,32 @@
+# e2e setting
+encoder: slowfast
+slowfast_depth: 50
+pretrained_model: https://download.openmmlab.com/mmaction/recognition/slowfast/slowfast_r50_256p_4x16x1_256e_kinetics400_rgb/slowfast_r50_256p_4x16x1_256e_kinetics400_rgb_20200728-145f1097.pth
+
+# model setting
+enc_layers: 4
+dec_layers: 4
+dim_feedforward: 1024
+# the number of queries: It should be set to a value that is slightly larger than the maximum number of actions per video.
+# slightly? there is only 20 classes in thumos?
+num_queries: 10
+
+# data setting
+dataset_name: badminton
+feature: img10fps
+online_slice: true
+# slice_len: If the videos are long and the actions are short, you may need to cut videos into slices (windows).
+#  The slice_len should be set to a value such that most actions are shorter than the corresponding duration. (slice_len = slice_duration * fps)
+slice_len: 256
+slice_overlap: 0.75
+test_slice_overlap: 0.25
+input_type: image
+
+# training setting (not finialized)
+lr: 0.0001
+batch_size: 4
+
+
+# output
+output_dir: outputs/badminton_e2e_slowfast_tadtr
+

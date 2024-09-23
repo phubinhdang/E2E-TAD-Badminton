@@ -19,8 +19,8 @@ def load_json(path):
 
 
 def get_valid_anno(gt_instances, slice, thr=0.75,
-        start_getter=lambda x: x['segment'][0],
-        end_getter=lambda x: x['segment'][1]):
+                   start_getter=lambda x: x['segment'][0],
+                   end_getter=lambda x: x['segment'][1]):
     '''Perform integrity based instance filtering'''
     start, end = slice
     kept_instances = []
@@ -33,15 +33,16 @@ def get_valid_anno(gt_instances, slice, thr=0.75,
             new_start = max(start_getter(inst), start)
             new_end = min(end_getter(inst), end)
             integrity = (new_end - new_start) * 1.0 / (end_getter(inst) - start_getter(inst))
-            
+
             if integrity >= thr:
-                new_inst = {k:v for k,v in inst.items()}
+                new_inst = {k: v for k, v in inst.items()}
                 new_inst['segment'] = [new_start - start, new_end - start]
                 kept_instances.append(new_inst)
     return kept_instances
 
 
-def get_dataset_dict(video_info_path, video_anno_path, subset, mode='test', exclude_videos=None, online_slice=False, slice_len=None, ignore_empty=True, slice_overlap=0, return_id_list=False):
+def get_dataset_dict(video_info_path, video_anno_path, subset, mode='test', exclude_videos=None, online_slice=False,
+                     slice_len=None, ignore_empty=True, slice_overlap=0, return_id_list=False):
     '''
     Prepare a dict that contains the information of each video, such as duration, annotations.
     Args:
@@ -82,7 +83,7 @@ def get_dataset_dict(video_info_path, video_anno_path, subset, mode='test', excl
             # video_info records the length in snippets, duration and fps (#frames per second) of the feature/image sequence
             video_info = video_ft_info[video_name]
             # number of frames or snippets
-            feature_length = int(video_info['feature_length'])   
+            feature_length = int(video_info['feature_length'])
             feature_fps = video_info['feature_fps']
             feature_second = video_info['feature_second']
         else:
@@ -120,13 +121,13 @@ def get_dataset_dict(video_info_path, video_anno_path, subset, mode='test', excl
                 feature_second = time_slices[1] - time_slices[0]
                 # perform integrity-based instance filtering
                 valid_annotations = get_valid_anno(annotations, time_slices)
-                
+
                 if not ignore_empty or len(valid_annotations) >= 1:
                     # rename the video slice
                     new_vid_name = video_name + '_window_{}_{}'.format(*slice)
                     new_vid_info = {
-                        'annotations': valid_annotations, 'src_vid_name': video_name, 
-                        'feature_fps': feature_fps, 'feature_length': slice_len, 
+                        'annotations': valid_annotations, 'src_vid_name': video_name,
+                        'feature_fps': feature_fps, 'feature_length': slice_len,
                         'subset': subset, 'feature_second': feature_second, 'time_offset': time_slices[0]}
                     video_dict[new_vid_name] = new_vid_info
                     id_list.append(new_vid_name)
@@ -141,9 +142,9 @@ def get_dataset_dict(video_info_path, video_anno_path, subset, mode='test', excl
 
                 if ignore_empty and len(valid_annotations) == 0:
                     continue
-                
+
                 video_dict[video_name] = {
-                    'src_vid_name': video_name, 'annotations': valid_annotations, 
+                    'src_vid_name': video_name, 'annotations': valid_annotations,
                     'feature_fps': feature_fps, 'feature_length': int(feature_length),
                     'subset': video_subset, 'feature_second': feature_second, 'time_offset': 0}
                 id_list.append(video_name)
@@ -177,32 +178,51 @@ def get_dataset_info(dataset, feature):
         # It means that the 'val' set of THUMOS14 is used for 'training', the 'test' set is used for 'validation'
         subset_mapping = {'train': 'val', 'val': 'test'}
         ann_file = path_info['thumos14']['ann_file']
-    
+
         if feature == 'i3d2s':
-            feature_info = {'local_path': path_info['thumos14'][feature]['local_path'], 'format': 'torch', 'fn_templ': '%s'}
+            feature_info = {'local_path': path_info['thumos14'][feature]['local_path'], 'format': 'torch',
+                            'fn_templ': '%s'}
             ft_info_file = path_info['thumos14'][feature]['ft_info_file']
 
         elif feature.startswith('img'):  # e.g. img10fps
             pos = feature.find('fps')
             fps = int(feature[3:pos])
-            
-            feature_info = {'local_path': path_info['thumos14']['img']['local_path'].format(fps), 
-            'format': 'jpg', 'fn_templ': '%s', 'img_fn_templ': '/img_%07d.jpg'}
+
+            feature_info = {'local_path': path_info['thumos14']['img']['local_path'].format(fps),
+                            'format': 'jpg', 'fn_templ': '%s', 'img_fn_templ': '/img_%07d.jpg'}
             ft_info_file = path_info['thumos14']['img']['ft_info_file'].format(fps)
         else:
             raise ValueError('unsupported feature, should be one of [i3d2s]')
+    elif dataset == 'badminton':
+        # It means that the 'val' set of badminton is used for 'training', the 'test' set is used for 'validation'
+        subset_mapping = {'train': 'val', 'val': 'test'}
+        ann_file = path_info['badminton']['ann_file']
+
+        if feature == 'i3d2s':
+            feature_info = {'local_path': path_info['thumos14'][feature]['local_path'], 'format': 'torch',
+                            'fn_templ': '%s'}
+            ft_info_file = path_info['thumos14'][feature]['ft_info_file']
+
+        elif feature.startswith('img'):  # e.g. img10fps
+            pos = feature.find('fps')
+            fps = int(feature[3:pos])
+
+            feature_info = {'local_path': path_info['badminton']['img']['local_path'].format(fps),
+                            'format': 'jpg', 'fn_templ': '%s', 'img_fn_templ': '/img_%07d.jpg'}
+            ft_info_file = path_info['badminton']['img']['ft_info_file'].format(fps)
+        else:
+            raise ValueError('unsupported feature, should be one of [i3d2s, img]')
 
     elif dataset == 'activitynet':
         raise NotImplementedError
 
     elif dataset == 'hacs':
         raise NotImplementedError
-    
+
     elif dataset == 'muses':
         raise NotImplementedError
-        
+
     else:
         raise ValueError('unsupported dataset {}'.format(dataset))
 
     return subset_mapping, feature_info, ann_file, ft_info_file
-

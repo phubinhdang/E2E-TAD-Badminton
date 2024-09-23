@@ -4,9 +4,9 @@ import os.path as osp
 
 
 def gen_thumos14_frames_info(frame_dir, fps):
-    files = os.listdir(frame_dir)
+    files = sorted(os.listdir(frame_dir))
     result_dict = {}
-    anno_dict = json.load(open(osp.expanduser('data/thumos14/th14_annotations_with_fps_duration.json')))['database']
+    anno_dict = json.load(open(osp.expanduser('data/badminton/badminton_annotations_with_fps_duration.json')))['database']
 
     for fname in files:
         vid = fname
@@ -22,10 +22,10 @@ def gen_thumos14_frames_info(frame_dir, fps):
     # if not osp.exists('data/thumos14'):
     #     os.makedirs('data/thumos14')
 
-    with open('data/thumos14/th14_img{}fps_info.json'.format(fps), 'w') as f:
+    with open('data/badminton/badminton_img{}fps_info.json'.format(fps), 'w') as f:
         json.dump(result_dict, f)
 
 
 if __name__ == '__main__':
-    frame_dir = 'data/thumos14/thumos14_img10fps'
+    frame_dir = 'data/badminton/img10fps'
     gen_thumos14_frames_info(frame_dir, 10)

@@ -9,3 +9,9 @@ thumos14:
   img:
     local_path: data/thumos14/thumos14_img{}fps
     ft_info_file: 'data/thumos14/th14_img{}fps_info.json'
+
+badminton:
+  ann_file: 'data/badminton/badminton_annotations_with_fps_duration.json'
+  img:
+    local_path: data/badminton/img{}fps
+    ft_info_file: 'data/badminton/badminton_img{}fps_info.json'
