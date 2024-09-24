@@ -1,10 +1,8 @@
-from re import sub
-import numpy as np
-import os.path as osp
-import concurrent.futures
-import os
 import argparse
+import concurrent.futures
 import json
+import os
+import os.path as osp
 
 
 def extract_frames(video_path, dst_dir, fps):
@@ -42,7 +40,7 @@ def mkdir_if_missing(dirname):
     if not osp.exists(dirname):
         os.makedirs(dirname)
 
-def main(subset):
+def main(subset, should_continue=False):
     args = parse_args()
 
     log_dir = 'logs/frame_extracted_{}fps'.format(args.fps)
@@ -56,9 +54,11 @@ def main(subset):
     end_ind = len(vid_names) if args.end is None else min(args.end, len(vid_names))
 
     vid_names = vid_names[args.start:args.end]
-
-    finished = os.listdir('logs/frame_extracted_{}fps'.format(args.fps))
-    videos_todo = list(sorted(set(vid_names).difference(finished)))
+    if should_continue:
+        finished = os.listdir('logs/frame_extracted_{}fps'.format(args.fps))
+        videos_todo = list(sorted(set(vid_names).difference(finished)))
+    else:
+        videos_todo = vid_names
     with concurrent.futures.ProcessPoolExecutor(4) as f:
         futures = [f.submit(extract_frames, osp.join(args.video_dir, x + '.mp4'),
                             osp.join(args.frame_dir, x), args.fps) for x in videos_todo]
