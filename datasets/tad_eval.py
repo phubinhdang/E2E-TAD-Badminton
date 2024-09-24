@@ -144,7 +144,7 @@ class TADEvaluator(object):
             if video_id not in self.video_ids:
                 continue
             this_dets = np.array(this_dets)  # start, end, score, label
-
+            #  [13.01395607 16.23436928  0.21894665  0.] # for binary dataset
             for nms_mode in self.nms_mode:
                 input_dets = np.copy(this_dets)
                 # if nms_mode == 'nms' and not (cfg.TEST_SLICE_OVERLAP > 0 and self.dataset_name == 'thumos14'):  # when cfg.TEST_SLICE_OVERLAP > 0, only do nms at summarization
@@ -159,7 +159,7 @@ class TADEvaluator(object):
 
                 # On ActivityNet, follow the tradition to use external video label
                 if assign_cls_labels:
-                    raise NotImplementedError
+                    dets[:, 3] = 0
                 self.all_pred[nms_mode] += [[video_id, k] + det for det in dets.tolist()]
 
     def nms_whole_dataset(self):
