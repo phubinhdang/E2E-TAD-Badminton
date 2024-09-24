@@ -3,7 +3,7 @@ import json
 import os.path as osp
 
 
-def gen_thumos14_frames_info(frame_dir, fps):
+def gen_dataset_frames_info(frame_dir, fps):
     files = sorted(os.listdir(frame_dir))
     result_dict = {}
     anno_dict = json.load(open(osp.expanduser('data/badminton/badminton_annotations_with_fps_duration.json')))['database']
@@ -28,4 +28,4 @@ def gen_thumos14_frames_info(frame_dir, fps):
 
 if __name__ == '__main__':
     frame_dir = 'data/badminton/img10fps'
-    gen_thumos14_frames_info(frame_dir, 10)
+    gen_dataset_frames_info(frame_dir, 10)
