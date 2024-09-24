@@ -150,16 +150,19 @@ class TADEvaluator(object):
                 # if nms_mode == 'nms' and not (cfg.TEST_SLICE_OVERLAP > 0 and self.dataset_name == 'thumos14'):  # when cfg.TEST_SLICE_OVERLAP > 0, only do nms at summarization
                 #     dets = apply_nms(input_dets, nms_thr=cfg.nms_thr, use_soft_nms=self.dataset_name=='activitynet' and assign_cls_labels)
                 # else:
-                if True:
-                    sort_idx = input_dets[:, 2].argsort()[::-1]
-                    dets = input_dets[sort_idx, :]
+                sort_idx = input_dets[:, 2].argsort()[::-1]
+                dets = input_dets[sort_idx, :]
 
                 # only keep top 200 detections per video
                 dets = dets[:200, :]
 
+                # just check out if it really predicts two classes (0, 1) or only one
+                logging.info(f'video_id: {video_id} | predicted classes: {set(dets[:, 3])}')
+
                 # On ActivityNet, follow the tradition to use external video label
                 if assign_cls_labels:
                     dets[:, 3] = 0
+
                 self.all_pred[nms_mode] += [[video_id, k] + det for det in dets.tolist()]
 
     def nms_whole_dataset(self):
