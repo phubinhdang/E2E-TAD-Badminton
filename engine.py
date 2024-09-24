@@ -28,16 +28,14 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     model.train()
     criterion.train()
 
-    # TOOD: fix exited debugger with no reason
-    # metric_logger = utils.MetricLogger(delimiter="  ")
-    # metric_logger.add_meter('lr', utils.SmoothedValue(
-    #     window_size=1, fmt='{value:.6f}'))
-    # header = 'Epoch: [{}]'.format(epoch)
-    # print_freq = 20
+    metric_logger = utils.MetricLogger(delimiter="  ")
+    metric_logger.add_meter('lr', utils.SmoothedValue(
+        window_size=1, fmt='{value:.6f}'))
+    header = 'Epoch: [{}]'.format(epoch)
+    print_freq = 20
     cnt = 0
 
-    # for samples, targets in metric_logger.log_every(data_loader, print_freq, header):
-    for samples, targets in tqdm.tqdm(data_loader, total=len(data_loader)):
+    for samples, targets in metric_logger.log_every(data_loader, print_freq, header):
         samples = samples.to(device)
         targets = [{k: v.to(device) if k in ['segments', 'labels']
         else v for k, v in t.items()} for t in targets]
@@ -81,19 +79,17 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             optimizer.step()
             optimizer.zero_grad()
 
-        # metric_logger.update(
-        #     loss=loss_value, **loss_dict_reduced_scaled, **loss_dict_reduced_unscaled)
-        # metric_logger.update(lr=optimizer.param_groups[0]["lr"])
+        metric_logger.update(
+            loss=loss_value, **loss_dict_reduced_scaled, **loss_dict_reduced_unscaled)
+        metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
         cnt += 1
 
     optimizer.zero_grad()
     # gather the stats from all processes
-    # metric_logger.synchronize_between_processes()
-    # logging.info(f"Averaged stats:{metric_logger}")
-    # return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
-    # FIXME
-    return {}
+    metric_logger.synchronize_between_processes()
+    logging.info(f"Averaged stats:{metric_logger}")
+    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
 
 def to_device(t, device):
