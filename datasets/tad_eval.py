@@ -157,7 +157,8 @@ class TADEvaluator(object):
                 dets = dets[:200, :]
 
                 # just check out if it really predicts two classes (0, 1) or only one
-                logging.info(f'video_id: {video_id} | predicted classes: {set(dets[:, 3])}')
+                # logging.info(f'video_id: {video_id} | predicted classes: {set(dets[:, 3])}')
+                # [10/01 20:41:01][INFO]: video_id: output016 | predicted classes: {0.0} -> only 0, it means only proposal
 
                 # On ActivityNet, follow the tradition to use external video label
                 if assign_cls_labels:
