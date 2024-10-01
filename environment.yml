@@ -1,12 +1,4 @@
-# conda env create|update -f environment.yml
+# conda env create -f environment.yml
 name: e2etad
-channels:
-  - pytorch
-  - nvidia
-  - defaults
 dependencies:
   - python=3.9
-  - pytorch=1.9 # see https://github.com/open-mmlab/mmdetection3d/issues/1332
-  - torchvision
-  - pytorch-cuda=12.1
-  - numpy==1.26
