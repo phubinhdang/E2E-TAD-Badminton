@@ -28,5 +28,5 @@ batch_size: 4
 
 
 # output
-output_dir: outputs/badminton_e2e_slowfast_tadtr
+output_dir: data/output/badminton
 
