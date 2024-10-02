@@ -549,15 +549,15 @@ class ResNet3dSlowFast(nn.Module):
         # output stride = 1
         if self.slow_upsample == 8:
             x_fast_down = x_fast
-            x_slow_up = F.interpolate(x_slow, scale_factor=8, mode='linear')
+            x_slow_up = F.interpolate(x_slow, scale_factor=8, mode='linear', align_corners=True)
         # output stride = 2
         elif self.slow_upsample == 4:
-            x_fast_down = F.interpolate(x_fast, scale_factor=0.5, mode='linear')
-            x_slow_up = F.interpolate(x_slow, scale_factor=4, mode='linear')
+            x_fast_down = F.interpolate(x_fast, scale_factor=0.5, mode='linear', align_corners=True)
+            x_slow_up = F.interpolate(x_slow, scale_factor=4, mode='linear', align_corners=True)
         # output stride = 4
         elif self.slow_upsample == 2:
-            x_fast_down = F.interpolate(x_fast, scale_factor=0.25, mode='linear')
-            x_slow_up = F.interpolate(x_slow, scale_factor=2, mode='linear')
+            x_fast_down = F.interpolate(x_fast, scale_factor=0.25, mode='linear', align_corners=True)
+            x_slow_up = F.interpolate(x_slow, scale_factor=2, mode='linear', align_corners=True)
         out = torch.cat((x_slow_up, x_fast_down), dim=1)
         return out
 
