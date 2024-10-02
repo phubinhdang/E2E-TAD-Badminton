@@ -301,6 +301,8 @@ class TADEvaluator(object):
                 self.stats[nms_mode]['AP50'] = self.stats[nms_mode]['per_iou_ap'][2]
             else:
                 self.stats[nms_mode]['AP50'] = self.stats[nms_mode]['per_iou_ap'][0]
+                self.stats[nms_mode]['AP75'] = self.stats[nms_mode]['per_iou_ap'][5]
+                self.stats[nms_mode]['AP95'] = self.stats[nms_mode]['per_iou_ap'][9]
         self.stats_summary = msg
 
     def compute_map(self, nms_mode):
