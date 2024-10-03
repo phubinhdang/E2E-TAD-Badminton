@@ -47,38 +47,48 @@ Mar, 2022: Our paper is accepted by CVPR 2022.
 
 SR: spatial (image) resolution. TR: temporal resolution, measured by the sampling frame rate on THUMOS14 and the number of sampled frames per video on ActivityNet.
 
-## 0.Install 
+## Install 
 ### Requirements
-
-* Linux or Windows. *Better with SSD*, because end-to-end has high IO demand.
-  
-* Python>=3.7
-
-* CUDA>=9.2, GCC>=5.4
-  
-* PyTorch>=1.5.1, torchvision>=0.6.1 (following instructions [here](https://pytorch.org/))
-  
-* Other requirements
-    ```bash
-    pip install -r requirements.txt
-    ```
+  ```bash
+  pip install -r requirements.txt
+  ```
 ### Compiling CUDA extensions
 The RoIAlign operator is implemented with CUDA extension.
-<!-- If your machine does have a NVIDIA GPU with CUDA support, you can run this step. Otherwise, please set `disable_cuda=True` in `opts.py`. -->
+If your machine does have a NVIDIA GPU with CUDA support, you can run this step. Otherwise, please set `disable_cuda=True` in `opts.py`.
+If you have multiple installations of CUDA Toolkits, you'd better add a prefix
+CUDA_HOME=<your_cuda_toolkit_path> to specify the correct version.
 ```bash
-cd model/ops;
-
-# If you have multiple installations of CUDA Toolkits, you'd better add a prefix
-# CUDA_HOME=<your_cuda_toolkit_path> to specify the correct version. 
-python setup.py build_ext --inplace
+cd models/ops && python setup.py build_ext --inplace
 ```
 
-### Run a quick test
+## Docker
+### Build
+
+```bash
+sudo docker build -t tad .
+```
+
+### Run
+
+To keep both input and output data accessible from outside the container,
+we mount the data on host machine to `/tad/data` dir of the container,
+so that the container can read and write data to external disk.
+
+```bash
+sudo docker run -it --gpus all -v <path_to_data_dir_on_your_host>:/tad/data --ipc=host --runtime=nvidia  tad:latest /bin/bash
+```
+
+### Start and Exec
+```bash
+sudo docker start <container_name_or_id> && sudo docker exec -it <container_name_or_id> /bin/bash
+```
+
+## Run a quick test
 ```
 python demo.py --cfg configs/thumos14_e2e_slowfast_tadtr.yml
 ```
 
-## 1.Data Preparation
+## Data Preparation
 ### THUMOS14
 Download video frames and annotation files from [[BaiduDrive](code: adTR)](https://pan.baidu.com/s/1MZtPjUSO_AlEqJmmhCFc3Q?pwd=adTR) or [[OneDrive]](https://husteducn-my.sharepoint.com/:f:/g/personal/liuxl_hust_edu_cn/Eglcf3femvhEpNl-5mmhDs4B0RiXiSX6UVOiOdUtG-VSTQ?e=XQm3jc).
 
@@ -98,7 +108,7 @@ python main.py --cfg CFG_PATH --eval --resume CKPT_PATH
 CFG_PATH is the path to the YAML-format config file that defines the experimental setting. For example, `configs/thumos14_e2e_slowfast_tadtr.yml`. CKPT_PATH is the path of the pre-trained model. Alternatively, you can execute the Shell script `bash scripts/test_reference_models_e2e.sh thumos14` for simplity.
 
 
-## 3.Training by Yourself 
+## Training by yourself 
 To be done. We are still checking the codebase. Plan to add official support of training ~~in the next week~~ later.
 <!-- (Preview version) -->
 
