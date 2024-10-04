@@ -81,9 +81,9 @@ def generate_clips_segments_for_match(match_name, df_rally_seg, fps, num_clips, 
                     segment=[round(start_time, 1), round(end_time, 1)],
                     label="rally"
                 ))
-        clip_name = f'{match_name}_{i:03d}.mp4'
+        clip_name = f'{match_name}_{i:03d}'
         clip_dir = Path(clip_dir)
-        clip_duration = get_video_duration_in_seconds(clip_dir / clip_name)
+        clip_duration = get_video_duration_in_seconds(clip_dir / f'{clip_name}.mp4')
         # Left out clips that do not contain any rallies
         if segments:
             clip_annos[clip_name] = ClipAnnotation(
