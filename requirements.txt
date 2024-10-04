@@ -16,3 +16,4 @@ setuptools==59.5.0
 more_itertools
 protobuf==3.20
 tensorboard
+pydantic
