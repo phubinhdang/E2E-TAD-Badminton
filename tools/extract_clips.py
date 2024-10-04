@@ -20,7 +20,6 @@ def extract_clips(input_video, output_dir):
         "-segment_time", "180",
         "-f", "segment",
         "-reset_timestamps", "1",
-        "-start_number", "1",
         f"{output_dir}/{video_name}_%03d.mp4"
     ]
 
@@ -31,6 +30,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--input_video', type=str, required=True,
                         help='Path to input video, relative to script working dir')
+    # FIXME: should later change to data/badminton/clips
     parser.add_argument('--output_dir', type=str, default='data/badminton/videos',
                         help='Dir for the output clips, relative to script working dir')
     parser.add_argument('--clip_len', type=int, default=180, help='Duration of clip in seconds')
