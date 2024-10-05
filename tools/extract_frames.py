@@ -3,6 +3,7 @@ import concurrent.futures
 import json
 import os
 import os.path as osp
+from pathlib import Path
 
 from tqdm import tqdm
 
@@ -32,8 +33,7 @@ def extract_frames(video_path, dst_dir, fps):
 
 def parse_args():
     parser = argparse.ArgumentParser('Extract frames')
-    parser.add_argument('--video_dir', help='path to the parent dir of video directory')
-    parser.add_argument('--frame_dir', help='path to save extracted video frames')
+    parser.add_argument('--data_dir', help='should contains "videos" subdir and an annotation file')
     parser.add_argument('--fps', type=int, default=10)
     parser.add_argument('-s', '--start', type=int)
     parser.add_argument('-e', '--end', type=int)
@@ -52,9 +52,13 @@ def main(subset, should_continue=False):
 
     log_dir = 'logs/frame_extracted_{}fps'.format(args.fps)
     mkdir_if_missing(log_dir)
-    mkdir_if_missing(args.video_dir)
 
-    database = json.load(open('data/badminton/badminton_annotations_with_fps_duration.json'))['database']
+    video_dir = Path(args.data_dir) / "videos"
+    frame_dir = Path(args.data_dir) / f"img{args.fps}fps"
+    mkdir_if_missing(frame_dir)
+
+    annotation_file_path = Path(args.data_dir) / "badminton_annotations_with_fps_duration.json"
+    database = json.load(open(annotation_file_path))['database']
     vid_names = list(sorted([x for x in database if database[x]['subset'] == subset]))
 
     start_ind = 0 if args.start is None else args.start
@@ -70,8 +74,8 @@ def main(subset, should_continue=False):
 
     with concurrent.futures.ProcessPoolExecutor(4) as executor:
         # Use tqdm to create a progress bar
-        futures = {executor.submit(extract_frames, osp.join(args.video_dir, f"{x}.mp4"),
-                                   osp.join(args.frame_dir, x), args.fps): x for x in videos_todo}
+        futures = {executor.submit(extract_frames, video_dir / f"{x}.mp4",
+                                   frame_dir / x, args.fps): x for x in videos_todo}
 
         for future in tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc='Extracting frames: '):
             # You can optionally check if the future was successful
@@ -86,4 +90,5 @@ if __name__ == '__main__':
     main('test')
 
 # thumos14 size is 78GB, see https://github.com/open-mmlab/mmaction2/blob/main/tools/data/thumos14/download_videos.sh
-# python tools/extract_frames.py --video_dir data/thumos14/videos --frame_dir data/thumos14/img10fps --fps  10 -e 4
+# python tools/extract_frames.py --data_dir data/inference --fps 10 -s 1 -e 2
+
