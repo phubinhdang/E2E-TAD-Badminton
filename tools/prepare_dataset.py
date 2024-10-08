@@ -92,13 +92,19 @@ def generate_clips_segments_for_match(match_name, rally_seg_path: Path, fps, num
                         segment=[round(start_time, 1), round(end_time, 1)],
                         label="rally"
                     ))
-            if segments:
-                clip_annos[clip_name] = ClipAnnotation(
-                    subset=subset,
-                    annotations=segments,
-                    fps=fps,
-                    duration=clip_duration
-                ).model_dump()
+            # if no rally in the clip then the whole clip is intro or outro
+            if not segments:
+                segments = [Segment(
+                        segment=[0, round(clip_duration)],
+                        label="none_rally"
+                    )]
+                
+            clip_annos[clip_name] = ClipAnnotation(
+                subset=subset,
+                annotations=segments,
+                fps=fps,
+                duration=clip_duration
+            ).model_dump()
 
     return clip_annos
 
