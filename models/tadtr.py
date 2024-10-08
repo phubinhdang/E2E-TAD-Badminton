@@ -478,6 +478,8 @@ def build(args):
             num_classes = 25
         elif args.dataset_name in ['activitynet', 'hacs']:
             num_classes = 200
+        elif args.dataset_name == 'badminton':
+            num_classes = 2
         else:
             raise ValueError('unknown dataset {}'.format(args.dataset_name))
 
