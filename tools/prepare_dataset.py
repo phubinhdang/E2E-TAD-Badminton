@@ -95,10 +95,10 @@ def generate_clips_segments_for_match(match_name, rally_seg_path: Path, fps, num
             # if no rally in the clip then the whole clip is intro or outro
             if not segments:
                 segments = [Segment(
-                        segment=[0, round(clip_duration)],
-                        label="none_rally"
-                    )]
-                
+                    segment=[start, end],
+                    label="none_rally"
+                ) for start, end in create_time_blocks(clip_duration, 20)]
+
             clip_annos[clip_name] = ClipAnnotation(
                 subset=subset,
                 annotations=segments,
@@ -107,6 +107,16 @@ def generate_clips_segments_for_match(match_name, rally_seg_path: Path, fps, num
             ).model_dump()
 
     return clip_annos
+
+
+def create_time_blocks(duration, block_size=20.0):
+    blocks = []
+    start = 0.0
+    while start < duration:
+        end = min(start + block_size, duration)
+        blocks.append((start, end))
+        start = end  # Move to the next block
+    return blocks
 
 
 def write_to_file(clip_segments, file_name):
