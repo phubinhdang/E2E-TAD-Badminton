@@ -33,7 +33,7 @@ def extract_frames(video_path, dst_dir, fps):
 
 def parse_args():
     parser = argparse.ArgumentParser('Extract frames')
-    parser.add_argument('--data_dir', help='should contains "videos" subdir and an annotation file')
+    parser.add_argument('--data_dir', help='should contains "videos" subdir and an annotation file', required=True)
     parser.add_argument('--fps', type=int, default=10)
     parser.add_argument('-s', '--start', type=int)
     parser.add_argument('-e', '--end', type=int)
