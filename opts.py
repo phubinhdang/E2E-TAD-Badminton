@@ -68,7 +68,7 @@ cfg.feature = 'i3d2s'
 # dimension (channels) of the video feature
 cfg.feature_dim = 2048
 # Perform binary detection (proposal generation) only 
-cfg.binary = True # for badminton dataset
+cfg.binary = False
 # Testing on Which subset 'val' or 'test' (For Anet and HACS). Note that we rename the training/validation/testing subsets for all datasets. For example, the validation subset used for training on THUMOS14 is renamed as 'train' subset.
 cfg.test_set = 'val'
 # whether to crop video into windows (A window is also called a slice in this codebase). Required for THUMOS14

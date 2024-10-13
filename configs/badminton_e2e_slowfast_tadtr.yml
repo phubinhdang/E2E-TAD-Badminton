@@ -21,11 +21,10 @@ slice_len: 256
 slice_overlap: 0.75
 test_slice_overlap: 0.25
 input_type: image
-
+binary: False
 # training setting (not finialized)
 lr: 0.0001
 batch_size: 4
-
 
 # output
 output_dir: data/output/badminton
