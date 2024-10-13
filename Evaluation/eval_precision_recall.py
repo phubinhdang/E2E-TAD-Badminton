@@ -1,6 +1,7 @@
 import dataclasses
+import itertools
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Callable, Iterable
 
 import numpy as np
 import pandas as pd
@@ -131,12 +132,11 @@ def create_confusion_matrix(preds: List[PredictionSegment], gts: List[GroundTrut
         # false positive
         else:
             fp += 1
+    fn = len(gts)
     # based on this tutorial: https://towardsdatascience.com/what-is-average-precision-in-object-detection-localization-algorithms-and-how-to-calculate-it-3f330efe697b
     # fn does not include preds that have iou smaller than threshold_iou
-    fn = len(gts)
-    print("tp =  ", tp)
-    print("fp =  ", fp)
-    print("fn = ", fn)
+    # under_threshold = [p for p in preds if 0.0 < p.best_iou < iou_threshold]
+    # fn = fn + len(under_threshold)
     return tp, fp, fn
 
 
@@ -144,32 +144,93 @@ def calc_precision_and_recall(tp, fp, fn):
     return tp / (tp + fp), tp / (tp + fn)
 
 
+def calc_precisions_and_recalls(thresholds, get_preds: Callable[[], List[PredictionSegment]]) -> (
+        List[float], List[float]):
+    precisions = []
+    recalls = []
+    for i, t in enumerate(thresholds):
+        gts = get_gts()
+        preds = get_preds()
+        if i == 0:
+            print("gts len: ", len(gts))
+            print("preds len: ", len(preds))
+        # print(f"threshold : {t}")
+        tp, fp, fn = create_confusion_matrix(preds, gts, t)
+        precision, recall = calc_precision_and_recall(tp, fp, fn)
+        precisions.append(precision)
+        recalls.append(recall)
+    return precisions, recalls
+
+
+def draw_PR_curves(precisions_data: List[List[float]], recalls_data: List[List[float]],
+                   thresholds: Iterable[float],
+                   legends: List[str]):
+    colors = itertools.cycle(plt.cm.tab10.colors)  # Use tab10 colormap for variety of colors
+
+    plt.figure(figsize=(10, 6))
+
+    # Iterate over each curve
+    for i, (precisions, recalls, legend) in enumerate(zip(precisions_data, recalls_data, legends)):
+        color = next(colors)
+
+        # Plot the PR curve
+        plt.plot(recalls, precisions, marker='o', color=color, label=f'Curve {i + 1}')
+
+        for i, threshold in enumerate(thresholds):
+            plt.text(recalls[i], precisions[i], f'{threshold:.2f}', fontsize=9, ha='right', va='bottom')
+            precisions_data = np.array(precisions_data)
+        recalls = np.array(recalls)
+        AP = np.sum((recalls[:-1] - recalls[1:]) * precisions[:-1])
+        print(f"Average Precision of {legend} = ", AP)
+
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.title("Precision-Recall Curve")
+    plt.legend(legends)
+    plt.grid()
+    plt.show()
+
+
+def draw_curves(precisions_data: List[List[float]],
+                thresholds: Iterable[float],
+                legends: List[str],
+                y_label: str,
+                title: str):
+    colors = itertools.cycle(plt.cm.tab10.colors)  # Use tab10 colormap for variety of colors
+
+    plt.figure(figsize=(10, 6))
+
+    # Iterate over each curve
+    for precisions in precisions_data:
+        color = next(colors)
+        plt.plot(thresholds, precisions, marker='o', color=color)
+
+    plt.xlabel("Threshold")
+    plt.ylabel(y_label)
+    plt.title(title)
+    plt.legend(legends)
+    plt.grid()
+    plt.show()
+
+
 thresholds = np.arange(start=0.5, stop=0.91, step=0.1)
-precisions = []
-recalls = []
-for i, t in enumerate(thresholds):
-    gts = get_gts()
-    preds = get_preds_grundprojekt()
-    if i == 0:
-        print("gts len: ", len(gts))
-        print("preds len: ", len(preds))
-    print(f"threshold : {t}")
-    tp, fp, fn = create_confusion_matrix(preds, gts, t)
-    precision, recall = calc_precision_and_recall(tp, fp, fn)
-    precisions.append(precision)
-    recalls.append(recall)
+precisions, recalls = calc_precisions_and_recalls(thresholds, get_preds_grundprojekt)
+precisions_tad, recalls_tad = calc_precisions_and_recalls(thresholds, get_preds_hauptprojekt)
+draw_PR_curves([precisions, precisions_tad],
+               [recalls, recalls_tad],
+               thresholds,
+               legends=["Video Recognition", "TAD"])
 
-plt.plot(recalls, precisions, linewidth=4, color="red", marker='o')
-plt.xlabel("Recall", fontsize=12, fontweight='bold')
-plt.ylabel("Precision", fontsize=12, fontweight='bold')
-for i, threshold in enumerate(thresholds):
-    plt.text(recalls[i], precisions[i], f'{threshold:.2f}', fontsize=9, ha='right', va='bottom')
+draw_curves([precisions, precisions_tad],
+            thresholds,
+            y_label="Precision",
+            title="Precision Comparison",
+            legends=["Video Recognition", "TAD"],
+            )
 
-plt.title("Precision-Recall Curve", fontsize=15, fontweight="bold")
-plt.show()
-
-precisions = np.array(precisions)
-recalls = np.array(recalls)
-AP = np.sum((recalls[:-1] - recalls[1:]) * precisions[:-1])
-
-print("Average Precision = ", AP)
+draw_curves([recalls, recalls_tad],
+            thresholds,
+            y_label="Recall",
+            title="Recall Comparison",
+            legends=["Video Recognition", "TAD"],
+            )
