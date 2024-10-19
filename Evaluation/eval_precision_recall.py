@@ -49,7 +49,7 @@ def get_gts() -> List[GroundTruthSegment]:
 
 
 def get_preds_hauptprojekt() -> List[PredictionSegment]:
-    df_preds = pd.read_csv('data/ginting_axelsen_hauptprojekt.csv')
+    df_preds = pd.read_csv('data/ginting_axelsen_hauptprojekt_full_match_binary.csv')
     pred_segments = []
     for s, e in zip(df_preds['start'], df_preds['end']):
         pred_segments.append(PredictionSegment(s, e, ss_to_mmss(s), ss_to_mmss(e), 0.0, None))
