@@ -18,7 +18,8 @@ def extract_frames(video_path, dst_dir, fps):
         subdir = 'test_set/TH14_test_set_mp4' if 'test' in video_fname else 'Validation_set/videos'
         url = f'https://crcv.ucf.edu/THUMOS14/{subdir}/{video_fname}'
         os.system('wget {} -O {} --no-check-certificate'.format(url, video_path))
-    cmd = 'ffmpeg -i "{}"  -filter:v "fps=fps={}" "{}/img_%07d.jpg"'.format(video_path, fps, dst_dir)
+    # ffmpeg with a progres bar
+    cmd = 'ffpb -i "{}"  -filter:v "fps=fps={}" "{}/img_%07d.jpg"'.format(video_path, fps, dst_dir)
 
     # Redirect output to /dev/null (Unix) or NUL (Windows)
     if os.name == 'posix':  # Unix-like OS
