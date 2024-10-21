@@ -4,6 +4,7 @@
 # Modified from DETR (https://github.com/facebookresearch/detr)
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 # ------------------------------------------------------------------------
+from datasets.prediction_merger import PredictionMerger
 
 """
 Train and eval functions used in main.py
@@ -98,6 +99,32 @@ def to_device(t, device):
     else:
         return t.to(device)
 
+def inference(model, criterion, postprocessor, data_loader, base_ds, device, output_dir, act_reg):
+    model.eval()
+    criterion.eval()
+    prediction_merger = PredictionMerger(base_ds)
+
+    cnt = 0
+    for (samples, targets) in tqdm.tqdm(data_loader, total=len(data_loader)):
+        samples = samples.to(device)
+        outputs = model((samples.tensors, samples.mask))
+
+        # raw_res.append((outputs, targets))
+        video_duration = torch.FloatTensor(
+            [t["video_duration"] for t in targets]).to(device)
+        results = postprocessor(outputs, video_duration, fuse_score=act_reg)
+
+        res = {target['video_id']: output for target,
+        output in zip(targets, results)}
+        if prediction_merger is not None:
+            prediction_merger.update(res)
+        if cnt > 5:
+            break
+        cnt += 1
+    output_path = output_dir + "/inference_detection.csv"
+    prediction_merger.dump_detection_to_json(output_path)
+    print("Wrote inference result to ", output_path)
+    
 
 @torch.no_grad()
 def test(model, criterion, postprocessor, data_loader, base_ds, device, output_dir, cfg, subset='val', epoch=None,

@@ -29,7 +29,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 from opts import get_args_parser, cfg, update_cfg_with_args, update_cfg_from_file
 import util.misc as utils
 from datasets import build_dataset
-from engine import train_one_epoch, test
+from engine import train_one_epoch, test, inference
 from models import build_model
 
 if cfg.tensorboard:
@@ -224,6 +224,11 @@ def main(args):
 
         if 'best_metric' in checkpoint:
             best_metric = checkpoint['best_metric']
+
+    if args.infer: 
+        inference(model, criterion, postprocessors, data_loader_val, 
+                  base_ds, device, cfg.output_dir, cfg.act_reg)
+        return
 
     if args.eval:
         test_stats = test(model, criterion, postprocessors,
