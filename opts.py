@@ -29,6 +29,7 @@ def get_args_parser():
     parser.add_argument('--resume', default='', help='resume from checkpoint')
     
     parser.add_argument('--eval', action='store_true', help='perform testing')
+    parser.add_argument('--infer', action='store_true', help='perform prediction on the new video')
     parser.add_argument('--num_workers', default=4, type=int, help='number of dataloader workers')
 
     # Multi-GPU training
@@ -51,7 +52,7 @@ cfg = EasyDict()
 # whether to enable tensorboard
 cfg.tensorboard = True
 # Disable CUDA extensions so that we can run the model on CPU
-cfg.disable_cuda = False
+cfg.disable_cuda = True
 # The backend of deformable attention, pytorch or CUDA
 cfg.dfm_att_backend = 'pytorch'
 
