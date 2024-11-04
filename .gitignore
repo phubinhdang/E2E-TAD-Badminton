@@ -141,3 +141,18 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# jetbrain editor
+.idea
+
+# vscode
+.vscode
+
+# logs
+logs
+
+# personal notes
+notes
+
+# latex for the paper
+latex
