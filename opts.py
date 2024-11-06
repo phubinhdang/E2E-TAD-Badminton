@@ -52,7 +52,7 @@ cfg = EasyDict()
 # whether to enable tensorboard
 cfg.tensorboard = True
 # Disable CUDA extensions so that we can run the model on CPU
-cfg.disable_cuda = True
+cfg.disable_cuda = False
 # The backend of deformable attention, pytorch or CUDA
 cfg.dfm_att_backend = 'pytorch'
 
