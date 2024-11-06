@@ -25,7 +25,7 @@ binary: True
 # training setting (not finialized)
 lr: 0.0001
 batch_size: 4
-
+epochs: 10
 # output
 output_dir: data/output/badminton
 
